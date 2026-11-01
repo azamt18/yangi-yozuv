@@ -2,7 +2,7 @@
   "name": "yangi-yozuv",
   "description": "Type the new Uzbek alphabet (Ş, Ç, Ö, Ğ) as you write — sh→ş, ch→ç, oʻ→ö, gʻ→ğ",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "scripts": {
     "dev": "wxt",
@@ -21,7 +21,10 @@
     "build:icons": "python3 scripts/build-icons.py"
   },
   "devDependencies": {
+    "@lexical/plain-text": "^0.53.0",
+    "esbuild": "^0.28.2",
     "happy-dom": "^21.0.4",
+    "lexical": "^0.53.0",
     "puppeteer": "^24.43.1",
     "typescript": "^5.9.3",
     "vite": "^8.1.5",

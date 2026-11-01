@@ -11,8 +11,19 @@ interface CaretContext {
   select(start: number, end: number): void;
 }
 
+/** What the last conversion left behind, so one Backspace can undo it. */
+interface Conversion {
+  target: Editable;
+  /** The word as typed, and what it was converted to. */
+  original: string;
+  replacement: string;
+  /** The character that ended the word; the browser types it after the conversion. */
+  boundary: string;
+}
+
 // Input types where people type words; email, url and password stay untouched.
 const TEXT_INPUT_TYPES = new Set(['text', 'search', '']);
+const MODIFIER_KEYS = new Set(['Shift', 'Control', 'Alt', 'Meta']);
 
 export default defineContentScript({
   matches: DEFAULT_SITES,
@@ -34,43 +45,34 @@ export default defineContentScript({
     disabledSitesItem.watch((value) => (siteDisabled = value.includes(location.hostname)));
     skipWordsItem.watch((value) => (skipWords = new Set(value)));
 
-    // What the last conversion inserted, so one Backspace can undo it.
-    let lastConversion: { target: Editable; original: string; inserted: string } | null = null;
+    let lastConversion: Conversion | null = null;
 
-    document.addEventListener(
-      'beforeinput',
-      (event) => {
-        if (!enabled || siteDisabled) return;
-        if (event.isComposing || event.inputType !== 'insertText') return;
-        if (!event.data || !isWordBoundary(event.data)) return;
-
-        const target = editableTarget(event.target);
-        const context = target && caretContext(target);
-        if (!target || !context) return;
-
-        const plan = planConversion(context.text, context.caret, { skipWords });
-        if (!plan) return;
-
-        // Replace the word and type the boundary in one edit, so the page's
-        // own editor (Telegram, Gmail) sees a normal insertion.
-        event.preventDefault();
-        context.select(plan.start, plan.end);
-        const inserted = plan.replacement + event.data;
-        document.execCommand('insertText', false, inserted);
-        lastConversion = { target, original: plan.original + event.data, inserted };
-      },
-      true,
-    );
-
-    // Enter types no character, so beforeinput above never sees it. Convert
-    // the last word before the page acts on Enter, because in chat apps Enter
-    // sends the message. Listening on document in the capture phase runs
-    // before the app's own handlers on the editor.
+    // Everything happens on keydown, before the key's own character is typed.
+    // Editors like Lexical (Instagram's message box) ignore edits a script makes
+    // from inside an input event and then apply the keystroke at a stale cursor
+    // position, which scrambled the text. A keydown handler isn't inside one.
     document.addEventListener(
       'keydown',
       (event) => {
+        if (event.isComposing || MODIFIER_KEYS.has(event.key)) return;
+
+        const previous = lastConversion;
+        lastConversion = null;
+        if (previous && event.key === 'Backspace' && event.target === previous.target) {
+          if (undoConversion(event, previous)) return;
+        }
+
         if (!enabled || siteDisabled) return;
-        if (event.key !== 'Enter' || event.isComposing) return;
+
+        // Enter types no word-ending character, but chat apps send on Enter,
+        // so the last word is converted first.
+        const isBoundaryKey =
+          event.key.length === 1 &&
+          isWordBoundary(event.key) &&
+          !event.ctrlKey &&
+          !event.metaKey &&
+          !event.altKey;
+        if (event.key !== 'Enter' && !isBoundaryKey) return;
 
         const target = editableTarget(event.target);
         const context = target && caretContext(target);
@@ -81,35 +83,54 @@ export default defineContentScript({
 
         context.select(plan.start, plan.end);
         document.execCommand('insertText', false, plan.replacement);
-        lastConversion = null;
-      },
-      true,
-    );
 
-    document.addEventListener(
-      'keydown',
-      (event) => {
-        if (!lastConversion) return;
-        const { target, original, inserted } = lastConversion;
-        if (event.key !== 'Backspace' || event.target !== target) {
-          if (!['Shift', 'Control', 'Alt', 'Meta'].includes(event.key)) lastConversion = null;
-          return;
+        // The browser types the boundary character right after this handler.
+        if (isBoundaryKey) {
+          lastConversion = {
+            target,
+            original: plan.original,
+            replacement: plan.replacement,
+            boundary: event.key,
+          };
         }
-        lastConversion = null;
-
-        const context = caretContext(target);
-        if (!context) return;
-        const start = context.caret - inserted.length;
-        if (start < 0 || context.text.slice(start, context.caret) !== inserted) return;
-
-        event.preventDefault();
-        context.select(start, context.caret);
-        document.execCommand('insertText', false, original);
       },
       true,
     );
 
     document.addEventListener('mousedown', () => (lastConversion = null), true);
+
+    /** Restores the typed word when Backspace comes right after a conversion. */
+    function undoConversion(
+      event: KeyboardEvent,
+      { target, original, replacement, boundary }: Conversion,
+    ) {
+      const context = caretContext(target);
+      if (!context) return false;
+      const typed = replacement + boundary;
+      const start = context.caret - typed.length;
+      if (start < 0) return false;
+      // Editable areas store a trailing space as a non-breaking space.
+      const before = context.text.slice(start, context.caret).replace(/\u00a0/g, ' ');
+      if (before !== typed) return false;
+
+      // Editors like Lexical handle Backspace in their own keydown listener,
+      // so the key must not reach them or they delete a character on top of this.
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      // Only the word is replaced, never the boundary character after it: Lexical
+      // throws away edits that reach across it. The caret then sits right after
+      // the restored word, so move it back past the boundary character. That
+      // waits a turn because Lexical puts its own caret back once it has caught
+      // up with the edit, which would undo an immediate move.
+      context.select(start, start + replacement.length);
+      document.execCommand('insertText', false, original);
+      setTimeout(() => {
+        const after = caretContext(target);
+        if (after) after.select(after.caret + boundary.length, after.caret + boundary.length);
+      });
+      return true;
+    }
   },
 });
 
