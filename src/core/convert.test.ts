@@ -145,3 +145,45 @@ describe('convertText', () => {
     );
   });
 });
+
+describe("convertText: the 'from' option", () => {
+  const mixed = "Shahar марказида choy ичамиз, o'zbek тилида";
+  const bothConverted = 'Şahar markazida çoy içamiz, özbek tilida';
+
+  it("converts old latin and cyrillic in the same text with 'auto'", () => {
+    expect(convertText(mixed, { from: 'auto' })).toBe(bothConverted);
+  });
+
+  it("is 'auto' by default", () => {
+    expect(convertText(mixed)).toBe(bothConverted);
+  });
+
+  it("converts only old latin with 'latin'", () => {
+    expect(convertText(mixed, { from: 'latin' })).toBe(
+      "Şahar марказида çoy ичамиз, özbek тилида",
+    );
+  });
+
+  it("converts only cyrillic with 'cyrillic'", () => {
+    expect(convertText(mixed, { from: 'cyrillic' })).toBe(
+      "Shahar markazida choy içamiz, o'zbek tilida",
+    );
+  });
+
+  it('uses the cyrillic rules for a token that has both kinds of letters', () => {
+    expect(convertText('чоsh', { from: 'auto' })).toBe('çosh');
+  });
+
+  it('passes the exception list to both converters', () => {
+    const skipWords = new Set(['shahzod', 'шаҳзод']);
+    expect(convertText('shahzod шаҳзод shahar шаҳар', { skipWords })).toBe(
+      'shahzod шаҳзод şahar şahar',
+    );
+  });
+
+  it('keeps links and numbers in cyrillic text', () => {
+    expect(convertText('сайт https://gov.uz/чой 2027', { from: 'auto' })).toBe(
+      'sayt https://gov.uz/чой 2027',
+    );
+  });
+});

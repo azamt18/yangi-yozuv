@@ -46,7 +46,7 @@ build in this order. each step ships on its own, with unit tests plus an e2e cas
 
 - [x] cyrillic → new latin mapping rules designed: `docs/CYRILLIC-RULES.md` `(opus)`
 - [x] `src/core/cyrillic.ts`: implement the rules, passing every example in the rules doc as a unit test `(sonnet)`
-- [ ] one `convertText(text, {from: 'auto'})` entry point that handles old latin, cyrillic, and mixed text. typing keeps its current path `(sonnet)`
+- [x] one `convertText(text, {from: 'auto'})` entry point that handles old latin, cyrillic, and mixed text. typing keeps its current path `(sonnet)`
 - [ ] **convert selection**: a context-menu item plus a shortcut (`commands` api, alt+shift+Y suggested, because ctrl+shift+L is taken by webiston and some sites). it replaces in place inside editable fields, otherwise it copies to the clipboard and shows a small toast. needs `contextMenus` (no new host permissions; it uses activeTab) `(sonnet)`
 - [ ] **popup converter box**: a textarea, live conversion, and a copy button `(sonnet)`
 - [ ] **exception list**: words in the popup settings that are never converted (case-insensitive, whole word), used by typing, selection, and page view `(sonnet)`

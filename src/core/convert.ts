@@ -1,9 +1,16 @@
+import { convertCyrillicWord, hasCyrillic } from './cyrillic';
 import englishWords from './data/english-words.json';
 import { isProtectedToken } from './protected';
 
 export interface ConvertOptions {
   /** Lowercase words the user never wants converted (names, brands). */
   skipWords?: ReadonlySet<string>;
+  /**
+   * Which spelling `convertText` reads. 'auto' (the default) decides per word:
+   * a word with a cyrillic letter uses the cyrillic rules, any other word is
+   * old Latin. `convertWord` itself only ever reads old Latin.
+   */
+  from?: 'auto' | 'latin' | 'cyrillic';
 }
 
 // Apostrophes people type for the old oʻ/gʻ mark. U+02BC (ʼ) is the tutuq
@@ -37,7 +44,11 @@ export function convertWord(token: string, options: ConvertOptions = {}): string
 
 /** Converts every word in a block of text, keeping all whitespace as is. */
 export function convertText(text: string, options: ConvertOptions = {}): string {
-  return text.replace(/\S+/g, (token) => convertWord(token, options));
+  const { from = 'auto' } = options;
+  return text.replace(/\S+/g, (token) => {
+    const cyrillic = from === 'cyrillic' || (from === 'auto' && hasCyrillic(token));
+    return cyrillic ? convertCyrillicWord(token, options) : convertWord(token, options);
+  });
 }
 
 function convertLetters(word: string): string {
