@@ -2,6 +2,26 @@
 
 goal: be the default way uzbeks type the new alphabet (ş, ç, ö, ğ) before and after the law o'rq-1184 takes effect on **2027-04-22**. users first, revenue later. hard rule on every platform: everything on device, no network requests, no tracking.
 
+## competitors (chrome web store, checked 2026-11-06)
+
+| extension | users | what it does | what it lacks |
+|---|---|---|---|
+| [lotin-kirill va yangi alifbo o'giruvchi](https://chromewebstore.google.com/detail/latin%E2%80%93cyrillic-new-alphab/inbahpclopinhpfodmfnambafebgopbp) (webiston.uz, v1.1.0) | 114, 5.0★ (4) | latin ↔ cyrillic ↔ new latin on selected text: a floating button, the right-click menu, ⌘/ctrl+shift+L to copy, an "almashtirish" button to replace in fields. auto-detects direction, handles the sh/ch boundary and -tsiya, skips links, emails and code. movable panel, dark mode, uz/ru/en ui, offline | no conversion as you type |
+| [alifboçi](https://chromewebstore.google.com/detail/alifbo%C3%A7i-%E2%80%94-%C3%B6zbek-alifbosi/fffmoebomciidpelckdgfoojaaadomhe) (alifbochi.uz, v1.0.0) | 47, no ratings | cyrillic / old latin → new latin: a converter box in the popup, select + copy, right-click menu, **shows the whole page in the new alphabet and restores it**, **user exception list for brand names**, light/dark theme, on device | no conversion as you type, no reverse direction |
+| [yangi alifbo by chessmaster.uz](https://chromewebstore.google.com/detail/yangi-alifbo-by-chessmast/hnekknbhhegbickoldchkhjdlhokeeah) (v1.2.2) | 33, 4.0★ (1) | displays page text in the new alphabet (old → new) | typing, selection, and cyrillic all unclear. privacy policy is on telegra.ph |
+
+**what this means:** all three are tiny (under 200 users in total) and all three convert text that is *already written*. none of them converts *while you type*, which is our core and still unique. so the plan is to match their read/convert features inside the same extension (phase 1), so users never need a second one, and keep as-you-type plus one-backspace undo as the headline.
+
+features to match, in priority order:
+1. convert the selection (context menu + shortcut), including cyrillic → new latin (all three, and webiston's main feature)
+2. a converter box in the popup: paste, convert, copy (alifboçi)
+3. user exception list (brand names, own words) that both typing and selection respect (alifboçi)
+4. "view this page in the new alphabet", with restore (alifboçi, chessmaster)
+5. uz/ru/en ui and dark mode (webiston, alifboçi)
+6. reverse direction, new latin → cyrillic / old latin, for sending to systems that don't support the new letters yet (webiston, partially). lowest priority
+
+---
+
 status legend: `[x]` done · `[ ]` todo · `(model)` suggested claude model for the task. what each tag means is under "model guide" at the bottom.
 
 ---
@@ -20,16 +40,26 @@ status legend: `[x]` done · `[ ]` todo · `(model)` suggested claude model for 
 
 **exit:** 0.1.1 live, there are no known breakages on the top 5 sites, and the first ~100 installs.
 
-## phase 1: extension v0.2, wider reach (dec 2026)
+## phase 1: extension v0.2, feature parity with competitors + wider reach (nov – dec 2026)
 
-- [ ] edge add-ons and firefox builds (wxt supports both, so mostly packaging) `(sonnet)`
-- [ ] "convert selection" context menu: fixes old-alphabet text that is already written `(sonnet)`
-- [ ] cyrillic → new latin conversion for selected text (much of the existing text is cyrillic) `(opus: design the mapping rules, sonnet: implement)`
+build in this order. each step ships on its own, with unit tests plus an e2e case where there is a page involved.
+
+- [x] cyrillic → new latin mapping rules designed: `docs/CYRILLIC-RULES.md` `(opus)`
+- [ ] `src/core/cyrillic.ts`: implement the rules, passing every example in the rules doc as a unit test `(sonnet)`
+- [ ] one `convertText(text, {from: 'auto'})` entry point that handles old latin, cyrillic, and mixed text. typing keeps its current path `(sonnet)`
+- [ ] **convert selection**: a context-menu item plus a shortcut (`commands` api, alt+shift+Y suggested, because ctrl+shift+L is taken by webiston and some sites). it replaces in place inside editable fields, otherwise it copies to the clipboard and shows a small toast. needs `contextMenus` (no new host permissions; it uses activeTab) `(sonnet)`
+- [ ] **popup converter box**: a textarea, live conversion, and a copy button `(sonnet)`
+- [ ] **exception list**: words in the popup settings that are never converted (case-insensitive, whole word), used by typing, selection, and page view `(sonnet)`
+- [ ] **view page in the new alphabet**: walks text nodes (skipping inputs, code/pre, scripts, contenteditable), keeps the originals in a WeakMap, has a "restore" button, and is per tab, not persistent. a MutationObserver handles content that loads later `(sonnet; opus if spa pages fight it)`
+- [ ] ui languages uz (default), ru, en via `_locales` + `browser.i18n`, plus dark mode via `prefers-color-scheme` `(haiku)`
 - [ ] per-site on/off toggle in the popup `(sonnet)`
-- [ ] **shared test vectors**: export the core cases to `spec/test-vectors.json`, which becomes the single source of truth for kotlin and swift `(sonnet)`
+- [ ] edge add-ons and firefox builds (wxt supports both, so mostly packaging) `(sonnet)`
+- [ ] **shared test vectors**: export the core + cyrillic cases to `spec/test-vectors.json`, which becomes the single source of truth for kotlin and swift `(sonnet)`
 - [ ] local-only usage counter in the popup ("you converted 1,240 words"). it stays on the device, nothing is sent `(haiku)`
+- [ ] update the store listing: "the only one that converts *as you type*, and it also converts cyrillic, selections and whole pages" plus new screenshots `(sonnet)`
+- [ ] later (low priority): reverse direction, new latin → cyrillic / old latin `(sonnet)`
 
-**exit:** live in 3 stores, and the test vectors are frozen as a versioned spec.
+**exit:** every feature the three competitors have is in yangi yozuv, it is live in 3 stores, and the test vectors are frozen as a versioned spec.
 
 ## phase 2: windows and office, for government work (dec 2026 – feb 2027)
 
