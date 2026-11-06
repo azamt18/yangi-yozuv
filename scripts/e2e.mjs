@@ -43,6 +43,17 @@ const GMAIL_PAGE = `<!doctype html><meta charset="utf-8">
 const bundle = async (entryPoint) =>
   (await build({ entryPoints: [entryPoint], bundle: true, format: 'iife', write: false }))
     .outputFiles[0].text;
+// A news page: prose to convert, and things that must stay as they are.
+const articlePage = (lang) => `<!doctype html><html lang="${lang}"><meta charset="utf-8"><body>
+<h1>Toshkent shahri</h1>
+<p id="p1">Shahar markazida choy ichdik. Ўзбекистон <b>Республикаси</b> https://shop.uz</p>
+<code id="code">shahar</code><pre id="pre">choy</pre>
+<textarea id="ta">shahar</textarea>
+<div id="ce" contenteditable="true">shahar</div>
+<script id="sc">var x = 'shahar';</script>
+<p id="english">The shop sells tea and the church is old.</p>
+<div id="late"></div>`;
+
 const lexicalBundle = await bundle(lexicalFixture);
 const prosemirrorBundle = await bundle(prosemirrorFixture);
 
@@ -65,7 +76,7 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 // Conversions happen as a separate step right after a keystroke, so give them a moment.
 const settle = () => sleep(120);
 
-async function openPage(path) {
+async function openPage(path, origin = 'https://test.uz') {
   const page = await browser.newPage();
   await page.setRequestInterception(true);
   page.on('request', (request) => {
@@ -79,6 +90,12 @@ async function openPage(path) {
     if (url === 'https://test.uz/lexical.js') {
       return request.respond({ contentType: 'text/javascript', body: lexicalBundle });
     }
+    if (url === 'https://test.uz/article') {
+      return request.respond({ contentType: 'text/html', body: articlePage('uz') });
+    }
+    if (url === 'https://test.example/article') {
+      return request.respond({ contentType: 'text/html', body: articlePage('en') });
+    }
     if (url === 'https://test.uz/prosemirror') {
       return request.respond({ contentType: 'text/html', body: PROSEMIRROR_PAGE });
     }
@@ -90,7 +107,7 @@ async function openPage(path) {
     }
     return request.continue();
   });
-  await page.goto(`https://test.uz${path}`);
+  await page.goto(`${origin}${path}`);
   await sleep(500); // let the content script start
   return page;
 }
@@ -106,16 +123,20 @@ const valueOf = async (page, selector) => {
 // What the context menu and the shortcut do: the background worker injects the
 // actions script and sends this message to the active tab, and the page answers with what it did.
 const worker = await (await browser.waitForTarget((t) => t.type() === 'service_worker')).worker();
-async function convertSelection(page) {
+async function sendToPage(page, message) {
   await page.bringToFront();
-  const kind = await worker.evaluate(async () => {
+  const answer = await worker.evaluate(async (message) => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     await chrome.scripting.executeScript({ target: { tabId: tab.id, allFrames: true }, files: ['/actions.js'] });
-    return chrome.tabs.sendMessage(tab.id, { type: 'convert-selection' });
-  });
+    return chrome.tabs.sendMessage(tab.id, message);
+  }, message);
   await settle();
-  return kind;
+  return answer;
 }
+const convertSelection = (page) => sendToPage(page, { type: 'convert-selection' });
+// What the popup's "view page in the new alphabet" button sends.
+const pageView = async (page, action, force = false) =>
+  (await sendToPage(page, { type: 'page-view', action, force }))?.valueOf();
 
 try {
   // ---- plain fields -------------------------------------------------------
@@ -273,6 +294,71 @@ try {
   check('selection: lexical result', await convertSelection(lexSel), 'replaced');
   check('selection: lexical text', await valueOf(lexSel, '#editor'), 'Şahar');
   await lexSel.close();
+
+  // ---- view page in the new alphabet -----------------------------------------
+  const view = await openPage('/article');
+  const text = (selector) => view.$eval(selector, (el) => ('value' in el ? el.value : el.textContent));
+
+  check('page view: starts off', await pageView(view, 'status'), 'off');
+  check('page view: start', await pageView(view, 'start'), 'on');
+  check(
+    'page view: prose is converted',
+    await text('#p1'),
+    'Şahar markazida çoy içdik. Özbekiston Respublikasi https://shop.uz',
+  );
+  check('page view: headline', await view.$eval('h1', (el) => el.textContent), 'Toşkent şahri');
+  check(
+    'page view: bold text inside prose is converted too',
+    await view.$eval('#p1 b', (el) => el.textContent),
+    'Respublikasi',
+  );
+  check('page view: english words are kept', await text('#english'), 'The shop sells tea and the church is old.');
+  for (const selector of ['#code', '#pre', '#ta', '#ce', '#sc']) {
+    const expected = selector === '#sc' ? "var x = 'shahar';" : selector === '#pre' ? 'choy' : 'shahar';
+    check(`page view: ${selector} is left alone`, await text(selector), expected);
+  }
+
+  await view.evaluate(() => {
+    const p = document.createElement('p');
+    p.id = 'added';
+    p.textContent = 'Yangi xabar: shahar choy';
+    document.getElementById('late').append(p);
+    document.getElementById('p1').firstChild.data = 'Yangilangan shahar ';
+  });
+  await settle();
+  await sleep(150);
+  check('page view: text added later is converted', await text('#added'), 'Yangi xabar: şahar çoy');
+  check(
+    'page view: text the page rewrites is converted',
+    (await text('#p1')).startsWith('Yangilangan şahar '),
+    true,
+  );
+
+  check('page view: status while on', await pageView(view, 'status'), 'on');
+  await view.evaluate(() => {
+    document.getElementById('late').firstChild.firstChild.data = 'Sahifa yangilandi';
+  });
+  check('page view: stop', await pageView(view, 'stop'), 'off');
+  check('page view: original text is back', await view.$eval('h1', (el) => el.textContent), 'Toshkent shahri');
+  check(
+    'page view: text the page changed meanwhile is kept',
+    await text('#added'),
+    'Sahifa yangilandi',
+  );
+  check('page view: restored prose', await text('#p1'), 'Yangilangan shahar Республикаси https://shop.uz');
+  await view.close();
+
+  // A page that isn't uzbek is not touched until the user insists.
+  const english = await openPage('/article', 'https://test.example');
+  const englishText = () => english.$eval('#english', (el) => el.textContent);
+  await english.evaluate(() => {
+    document.body.innerHTML = '<p id="english">The shop sells tea and the church is old. Привет, как дела?</p>';
+  });
+  check('page view: other-language page asks first', await pageView(english, 'start'), 'not-uzbek');
+  check('page view: other-language page is untouched', await englishText(), 'The shop sells tea and the church is old. Привет, как дела?');
+  check('page view: convert anyway', await pageView(english, 'start', true), 'on');
+  check('page view: forced conversion', await englishText(), 'The shop sells tea and the church is old. Privet, kak dela?');
+  await english.close();
 
   // ---- popup converter box --------------------------------------------------
   const popup = await browser.newPage();

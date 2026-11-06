@@ -127,6 +127,23 @@ textarea {
   background: var(--chip);
 }
 
+.page-view {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 10px;
+}
+
+.page-view p {
+  margin: 0;
+  font-size: 12px;
+}
+
+button.secondary {
+  background: var(--chip);
+  color: var(--fg);
+}
+
 button:disabled {
   opacity: 0.5;
   cursor: default;

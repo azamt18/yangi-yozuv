@@ -1,4 +1,5 @@
 import { convertText } from '@/core/convert';
+import { MESSAGE_PAGE_VIEW, type PageViewState } from '@/utils/messages';
 import { disabledSitesItem, enabledItem, skipWordsItem } from '@/utils/settings';
 import { siteOrigin } from '@/utils/sites';
 
@@ -102,6 +103,47 @@ async function setUpConverter() {
   });
 }
 
+async function setUpPageView() {
+  const toggle = $<HTMLButtonElement>('page-view-toggle');
+  const note = $('page-view-note');
+  const force = $<HTMLButtonElement>('page-view-force');
+
+  const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+  if (tab?.id === undefined || !tab.url?.startsWith('http')) {
+    note.textContent = 'Bu sahifada işlamaydi';
+    note.hidden = false;
+    return;
+  }
+  const tabId = tab.id;
+
+  const send = (action: 'status' | 'start' | 'stop', forced = false): Promise<PageViewState> =>
+    browser.tabs.sendMessage(tabId, { type: MESSAGE_PAGE_VIEW, action, force: forced });
+
+  const show = (state: PageViewState) => {
+    toggle.disabled = false;
+    toggle.dataset.state = state;
+    toggle.textContent = state === 'on' ? 'Asliga qaytariş' : 'Sahifani yangi alifboda köriş';
+    note.hidden = force.hidden = state !== 'not-uzbek';
+    note.textContent = 'Bu sahifa özbek tilida emasdek köriniyapti.';
+  };
+
+  // The actions script is only in the page once something has asked for it, so
+  // "no answer" just means the view is off. Opening the popup grants activeTab,
+  // which lets the buttons below inject it.
+  const run = async (action: 'start' | 'stop', forced = false) => {
+    await browser.scripting.executeScript({
+      target: { tabId, allFrames: true },
+      files: ['/actions.js'],
+    });
+    show(await send(action, forced));
+  };
+
+  show(await send('status').catch((): PageViewState => 'off'));
+  toggle.addEventListener('click', () => run(toggle.dataset.state === 'on' ? 'stop' : 'start'));
+  force.addEventListener('click', () => run('start', true));
+}
+
+setUpPageView();
 setUpConverter();
 setUpEnabledSwitch();
 setUpSiteRow();
