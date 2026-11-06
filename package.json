@@ -2,7 +2,7 @@
   "name": "yangi-yozuv",
   "description": "Type the new Uzbek alphabet (Ş, Ç, Ö, Ğ) as you write — sh→ş, ch→ç, oʻ→ö, gʻ→ğ",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",

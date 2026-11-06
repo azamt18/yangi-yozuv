@@ -25,20 +25,40 @@ Yangi oʻzbek alifbosida odatdagidek yozing.
   oʻzbek → özbek
   togʻ → toğ
 
+YOZGANINGIZDA
+• Soʻz tugashi bilan almashadi: toʻgʻridan-toʻgʻri matn maydonida.
 • Inglizcha soʻzlar, havolalar, email va @username oʻzgarmaydi.
 • Xato almashtirsa, darhol Backspace bosing: soʻz qaytadi.
 • Ismlar va brendlar uchun "oʻzgartirilmaydigan soʻzlar" roʻyxati.
-• Telegram Web, Gmail, Facebook, Instagram, WhatsApp Web va barcha .uz saytlarda ishlaydi. Boshqa saytda bir tugma bilan yoqiladi.
 
-Hech narsa kompyuteringizdan chiqmaydi. Yozganlaringiz hech qayerga yuborilmaydi: kengaytma internetga umuman murojaat qilmaydi.
+TAYYOR MATN UCHUN
+• Matnni belgilang, sichqonchaning oʻng tugmasini bosing yoki Alt+Shift+Y: yangi alifboga oʻtadi (kirill ham, eski lotin ham).
+• "Sahifani yangi alifboda koʻrish": butun sahifa yangi harflarda, bir tugma bilan asliga qaytadi.
+• Oynadagi matn oʻgiruvchi: qoʻying, nusxa oling.
+
+• Telegram Web, Gmail, Facebook, Instagram, WhatsApp Web va barcha .uz saytlarda ishlaydi. Boshqa saytda bir tugma bilan yoqiladi.
+• Oʻzbekcha, ruscha va inglizcha interfeys.
+
+Hech narsa kompyuteringizdan chiqmaydi. Yozganlaringiz hech qayerga yuborilmaydi: kengaytma internetga umuman murojaat qilmaydi. Kodi ochiq: github.com/azamt18/yangi-yozuv
 
 —
 
 Type the new Uzbek Latin alphabet the way you already type.
 
-From 22 April 2027, Uzbek replaces Sh, Ch, Oʻ and Gʻ with Ş, Ç, Ö and Ğ. Keep typing as usual and Yangi Yozuv converts each word when you finish it. English words, links, emails and @usernames are left alone, and one Backspace undoes a conversion.
+From 22 April 2027, Uzbek replaces Sh, Ch, Oʻ and Gʻ with Ş, Ç, Ö and Ğ. Keep typing as usual and Yangi Yozuv converts each word when you finish it.
 
-Everything runs inside your browser. Nothing you type is ever sent anywhere: the extension makes no network requests at all.
+AS YOU TYPE
+• English words, links, emails and @usernames are left alone, and one Backspace undoes a conversion.
+• A list of words that are never converted (names, brands).
+
+FOR TEXT YOU ALREADY HAVE
+• Select text and use the right-click menu or Alt+Shift+Y: it converts Cyrillic and the old Latin spelling to the new alphabet.
+• "View page in the new alphabet" rewrites a whole page and restores it with one click.
+• A text converter in the popup: paste, copy.
+
+The interface is in Uzbek, Russian and English.
+
+Everything runs inside your browser. Nothing you type is ever sent anywhere: the extension makes no network requests at all. Open source: github.com/azamt18/yangi-yozuv
 ```
 
 **Graphics:**
@@ -49,12 +69,13 @@ Everything runs inside your browser. Nothing you type is ever sent anywhere: the
 ## Privacy practices tab
 
 **Single purpose:**
-Converts Uzbek words typed in the old Latin spelling (sh, ch, oʻ, gʻ) to the new 2027 alphabet (ş, ç, ö, ğ) as the user types.
+Converts Uzbek words typed in the old Latin spelling (sh, ch, oʻ, gʻ) to the new 2027 alphabet (ş, ç, ö, ğ) as the user types, and converts text the user selects (including Cyrillic) or a whole page to the new alphabet when the user asks.
 
 **Permission justifications:**
 - `storage`: saves the user's settings (on/off, sites turned off, words never to convert) in the browser.
-- `scripting`: starts the extension on sites the user turns on from the popup.
-- `activeTab`: reads the current tab's address when the popup opens, to show whether the extension works on that site.
+- `scripting`: starts the extension on sites the user turns on from the popup, and runs "convert selection" and "view page in the new alphabet" in the current tab when the user asks for them.
+- `activeTab`: lets those two actions work on the tab the user is looking at, only after the user clicks the menu item, presses the shortcut or opens the popup, and shows the current site's address in the popup.
+- `contextMenus`: adds the right-click item "Convert to the new alphabet" for selected text.
 - Host permissions (content script on listed sites, optional on others): the extension needs to see what the user types in text fields on those sites to convert it. The text is processed locally and never leaves the device.
 - Remote code: **No**, all code is bundled.
 

@@ -56,7 +56,7 @@ build in this order. each step ships on its own, with unit tests plus an e2e cas
 - [x] edge add-ons and firefox builds `(sonnet)`. firefox builds as mv3 (`npm run zip:firefox`), `web-ext lint` is clean, steps in `docs/PUBLISHING.md`. **not yet run inside firefox itself**, and the actual store submissions are yours to do
 - [x] **shared test vectors**: export the core + cyrillic cases to `spec/test-vectors.json`, which becomes the single source of truth for kotlin and swift `(sonnet)` 142 cases in `spec/test-vectors.json`, with the contract for ports in `spec/README.md`; `src/core/test-vectors.test.ts` makes the typescript code pass them
 - [x] local-only usage counter in the popup ("you converted 1,240 words"). it stays on the device, nothing is sent `(haiku)`. counts typing (and takes back an undo) plus selection; page view isn't counted. `PRIVACY.md` now mentions the number
-- [ ] update the store listing: "the only one that converts *as you type*, and it also converts cyrillic, selections and whole pages" plus new screenshots `(sonnet)`
+- [x] update the store listing: "the only one that converts *as you type*, and it also converts cyrillic, selections and whole pages" plus new screenshots `(sonnet)`. text and permission justifications are in `store/LISTING.md`, uzbek popup screenshots are regenerated (`npm run store:graphics`); **pasting them into the dashboard is yours**. the gmail / whatsapp web claims in the description are still unverified
 - [ ] later (low priority): reverse direction, new latin → cyrillic / old latin `(sonnet)`
 
 **exit:** every feature the three competitors have is in yangi yozuv, it is live in 3 stores, and the test vectors are frozen as a versioned spec.
