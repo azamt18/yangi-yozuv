@@ -28,9 +28,22 @@ const LEXICAL_PAGE = `<!doctype html><meta charset="utf-8">
 <div id="editor" contenteditable="true" style="white-space:pre-wrap;min-height:60px"></div>
 <script src="/lexical.js"></script>`;
 
-const lexicalBundle = (
-  await build({ entryPoints: [lexicalFixture], bundle: true, format: 'iife', write: false })
-).outputFiles[0].text;
+const prosemirrorFixture = fileURLToPath(new URL('./fixtures/prosemirror-editor.js', import.meta.url));
+
+const PROSEMIRROR_PAGE = `<!doctype html><meta charset="utf-8">
+<div id="editor" style="min-height:60px"></div>
+<script src="/prosemirror.js"></script>`;
+
+// Gmail's compose box: a plain contenteditable where every line is its own <div>,
+// the first line is bare text, and an empty line holds a <br>.
+const GMAIL_PAGE = `<!doctype html><meta charset="utf-8">
+<div id="editor" contenteditable="true" role="textbox" aria-multiline="true" style="min-height:60px"></div>`;
+
+const bundle = async (entryPoint) =>
+  (await build({ entryPoints: [entryPoint], bundle: true, format: 'iife', write: false }))
+    .outputFiles[0].text;
+const lexicalBundle = await bundle(lexicalFixture);
+const prosemirrorBundle = await bundle(prosemirrorFixture);
 
 const browser = await puppeteer.launch({
   headless: true,
@@ -64,6 +77,15 @@ async function openPage(path) {
     }
     if (url === 'https://test.uz/lexical.js') {
       return request.respond({ contentType: 'text/javascript', body: lexicalBundle });
+    }
+    if (url === 'https://test.uz/prosemirror') {
+      return request.respond({ contentType: 'text/html', body: PROSEMIRROR_PAGE });
+    }
+    if (url === 'https://test.uz/prosemirror.js') {
+      return request.respond({ contentType: 'text/javascript', body: prosemirrorBundle });
+    }
+    if (url === 'https://test.uz/gmail') {
+      return request.respond({ contentType: 'text/html', body: GMAIL_PAGE });
     }
     return request.continue();
   });
@@ -162,6 +184,46 @@ try {
   await send.keyboard.press('Enter');
   await settle();
   check('lexical Enter converts before sending', await send.evaluate(() => window.sent[0]), 'Rahmat, yaxşi');
+
+  // ---- ProseMirror (chatgpt.com, claude.ai) ---------------------------------
+  const pm = await openPage('/prosemirror');
+  await pm.click('#editor .ProseMirror');
+  await pm.keyboard.type(sentence, { delay: 40 });
+  check('prosemirror typing', await valueOf(pm, '#editor'), expected);
+  await pm.keyboard.type('shahar ');
+  await settle();
+  await pm.keyboard.press('Backspace');
+  check(
+    'prosemirror backspace undo',
+    (await valueOf(pm, '#editor')).endsWith('bordim, shahar '),
+    true,
+  );
+  await pm.keyboard.type('Rahmat, yaxshi');
+  await settle();
+  await pm.keyboard.press('Enter');
+  await settle();
+  check(
+    'prosemirror Enter converts before sending',
+    (await pm.evaluate(() => window.sent[0])).endsWith('Rahmat, yaxşi'),
+    true,
+  );
+  await pm.close();
+
+  // ---- Gmail-style compose box (nested <div> per line) ----------------------
+  const gmail = await openPage('/gmail');
+  await gmail.click('#editor');
+  await gmail.keyboard.type('Salom shahar, choy ichamiz', { delay: 20 });
+  await gmail.keyboard.press('Enter');
+  await gmail.keyboard.type('Yaxshi qoling, oʻzbek tili ', { delay: 20 });
+  await settle();
+  check(
+    'gmail-style, two lines',
+    await gmail.$eval('#editor', (el) =>
+      [...el.childNodes].map((n) => n.textContent.replace(/ /g, ' ')).join('|'),
+    ),
+    'Salom şahar, çoy içamiz|Yaxşi qoling, özbek tili ',
+  );
+  await gmail.close();
 } finally {
   await browser.close();
 }

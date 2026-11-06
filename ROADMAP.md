@@ -11,10 +11,12 @@ status legend: `[x]` done · `[ ]` todo · `(model)` suggested claude model for 
 - [x] chrome extension 0.1.0 published on the chrome web store
 - [x] 0.1.1: convert on keydown so lexical editors (instagram) keep the cursor in place
 - [ ] upload 0.1.1 zip as a store update (manual, dashboard → package → upload new package)
-- [ ] manual test pass: gmail, google docs comments, yandex browser, opera, telegram web, facebook, linkedin `(sonnet)`
+- [x] e2e coverage by editor type: plain fields, Lexical, ProseMirror, Gmail-style nested divs (17 checks, all pass)
+- [ ] manual test on the live sites, which the e2e suite can't log into: gmail, whatsapp web, linkedin, facebook; plus yandex browser and opera (user, 10 minutes)
 - [ ] fix whatever breaks, adding an e2e case for each one `(sonnet; opus if it's an editor-internals bug like lexical)`
-- [ ] store listing in uzbek and russian (description, screenshots with real ş/ç/ö/ğ examples) `(sonnet)`
-- [ ] telegram announcement in uzbek and a channel for feedback `(sonnet)`
+- [x] russian store description and uzbek telegram announcement drafted in `store/LAUNCH-TEXTS.md`
+- [ ] paste the russian listing into the dashboard, then post the announcement (add a feedback contact first)
+- [ ] screenshots with real ş/ç/ö/ğ examples in uzbek `(sonnet)`
 
 **exit:** 0.1.1 live, there are no known breakages on the top 5 sites, and the first ~100 installs.
 
