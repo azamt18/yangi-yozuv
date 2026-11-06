@@ -1,9 +1,6 @@
 import { isWordBoundary, planConversion } from '@/core/typing';
-import { convertSelection } from '@/utils/convert-selection';
-import { MESSAGE_CONVERT_SELECTION } from '@/utils/messages';
 import { disabledSitesItem, enabledItem, skipWordsItem } from '@/utils/settings';
 import { DEFAULT_SITES, EXCLUDED_SITES } from '@/utils/sites';
-import { TEXT, showToast } from '@/utils/toast';
 
 type Editable = HTMLInputElement | HTMLTextAreaElement | HTMLElement;
 
@@ -40,16 +37,6 @@ export default defineContentScript({
     const flagged = window as unknown as { __yangiYozuv?: boolean };
     if (flagged.__yangiYozuv) return;
     flagged.__yangiYozuv = true;
-
-    // "Convert selection" comes from the context menu or the shortcut. It is an
-    // explicit request, so it works even where typing is switched off. This is
-    // registered before the awaits below so a freshly injected script is ready
-    // for the message the background worker sends right after injecting it.
-    browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-      if (message?.type !== MESSAGE_CONVERT_SELECTION) return;
-      convertSelectionAndReport().then(sendResponse);
-      return true; // the answer is sent after the storage read
-    });
 
     let enabled = await enabledItem.getValue();
     let siteDisabled = (await disabledSitesItem.getValue()).includes(location.hostname);
@@ -146,22 +133,6 @@ export default defineContentScript({
     }
   },
 });
-
-async function convertSelectionAndReport(): Promise<string> {
-  const result = await convertSelection(new Set(await skipWordsItem.getValue()));
-  if (result.kind === 'unchanged') {
-    showToast({ message: TEXT.unchanged });
-  } else if (result.kind === 'readonly') {
-    try {
-      await navigator.clipboard.writeText(result.text);
-      showToast({ message: TEXT.copied });
-    } catch {
-      // The page doesn't allow a script to write to the clipboard here.
-      showToast({ message: TEXT.readonly, copyText: result.text });
-    }
-  }
-  return result.kind;
-}
 
 function editableTarget(node: EventTarget | null): Editable | null {
   if (node instanceof HTMLInputElement) return TEXT_INPUT_TYPES.has(node.type) ? node : null;

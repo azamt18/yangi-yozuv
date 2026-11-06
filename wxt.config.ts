@@ -15,5 +15,8 @@ export default defineConfig({
       },
     },
     optional_host_permissions: ['*://*/*'],
+    // Only the browser test sets this (npm run test:e2e). It stands in for the
+    // activeTab grant a real click gives, which a script can't produce.
+    ...(process.env.YANGI_YOZUV_E2E ? { host_permissions: ['*://test.uz/*'] } : {}),
   },
 });

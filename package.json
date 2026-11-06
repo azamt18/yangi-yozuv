@@ -16,7 +16,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "build:words": "node scripts/build-english-list.mjs",
-    "test:e2e": "wxt build && node scripts/e2e.mjs",
+    "test:e2e": "YANGI_YOZUV_E2E=1 wxt build && node scripts/e2e.mjs",
     "store:graphics": "wxt build && node scripts/screenshot-popup.mjs && node scripts/store-graphics.mjs",
     "build:icons": "python3 scripts/build-icons.py"
   },

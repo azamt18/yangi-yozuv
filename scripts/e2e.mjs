@@ -103,13 +103,14 @@ const valueOf = async (page, selector) => {
   );
 };
 
-// What the context menu and the shortcut do: the background worker sends this
-// message to the active tab, and the page answers with what it did.
+// What the context menu and the shortcut do: the background worker injects the
+// actions script and sends this message to the active tab, and the page answers with what it did.
 const worker = await (await browser.waitForTarget((t) => t.type() === 'service_worker')).worker();
 async function convertSelection(page) {
   await page.bringToFront();
   const kind = await worker.evaluate(async () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    await chrome.scripting.executeScript({ target: { tabId: tab.id, allFrames: true }, files: ['/actions.js'] });
     return chrome.tabs.sendMessage(tab.id, { type: 'convert-selection' });
   });
   await settle();
