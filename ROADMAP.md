@@ -15,7 +15,7 @@ status legend: `[x]` done · `[ ]` todo · `(model)` suggested claude model for 
 - [ ] manual test on the live sites, which the e2e suite can't log into: gmail, whatsapp web, linkedin, facebook; plus yandex browser and opera (user, 10 minutes)
 - [ ] fix whatever breaks, adding an e2e case for each one `(sonnet; opus if it's an editor-internals bug like lexical)`
 - [x] russian store description and uzbek telegram announcement drafted in `store/LAUNCH-TEXTS.md`
-- [ ] paste the russian listing into the dashboard, then post the announcement (add a feedback contact first)
+- [ ] post the announcement (add a feedback contact first). the russian listing is optional and low priority: it rests on an unverified guess that many users search the store in russian
 - [ ] screenshots with real ş/ç/ö/ğ examples in uzbek `(sonnet)`
 
 **exit:** 0.1.1 live, there are no known breakages on the top 5 sites, and the first ~100 installs.
@@ -31,7 +31,22 @@ status legend: `[x]` done · `[ ]` todo · `(model)` suggested claude model for 
 
 **exit:** live in 3 stores, and the test vectors are frozen as a versioned spec.
 
-## phase 2: android keyboard (jan – mar 2027)
+## phase 2: windows and office, for government work (dec 2026 – feb 2027)
+
+why: most government work happens in word and excel on windows, where a browser extension never runs. those offices also hold huge archives of existing documents that have to move to the new alphabet. this is probably the biggest single user group before the law date, so it goes before android.
+
+unverified assumptions (check with real gov users before building): windows desktop office rather than the web version; staff cannot install software without admin rights; internet access may be restricted; IT must approve anything they install.
+
+- [ ] talk to 2–3 people who work in gov offices: what they use, what IT lets them install, what they'd convert first (user, 1 week)
+- [ ] **bulk document converter first**, because it works under any IT policy: a static page that runs fully in the browser, where you drop in `.docx` / `.xlsx` / `.pptx` and get converted copies back. nothing is installed and nothing is uploaded. it reuses the typescript core. rules to get right: words split across formatting runs, excel cell values (never formulas, sheet names or number formats), headers/footers/footnotes, cyrillic → new latin as an option `(opus: run-splitting and excel rules, sonnet: implement)`
+- [ ] test on real gov-style documents, comparing before and after by eye, plus automated checks that formatting and formulas are unchanged `(sonnet)`
+- [ ] typing inside word and excel, decided after the gov-user talks: (a) windows input method, which works in every app but is the hardest and usually needs admin; (b) tray helper with a keyboard hook, simpler but antivirus and IT may block it; (c) office add-in, which installs per user from an org catalog but can't intercept keystrokes, so it converts the selection or on a button; (d) a keyboard layout with ş ç ö ğ only, no auto-convert `(opus: pick the approach)`
+- [ ] check ş ç ö ğ render in the fonts government documents use (times new roman, arial, calibri) `(sonnet)`
+- [ ] a one-page note in uzbek for IT departments: open source, no network access, how to verify the download `(sonnet)`
+
+**exit:** a government employee can convert a folder of old documents in minutes without installing anything, and has a way to type the new letters in word.
+
+## phase 3: android keyboard (feb – apr 2027)
 
 this is the biggest lever, because most uzbek users type on phones. the competitor is alifbo (open source, old→new button). we differ by converting automatically as you type, with the same "when unsure, don't convert" rules.
 
@@ -45,7 +60,7 @@ this is the biggest lever, because most uzbek users type on phones. the competit
 
 **exit:** public on google play, with beta feedback addressed.
 
-## phase 3: law-date campaign (mar – apr 2027)
+## phase 4: law-date campaign (mar – apr 2027)
 
 - [ ] landing page (static, no analytics) explaining the new letters, with links to all versions `(sonnet)`
 - [ ] outreach: teachers, uzbek tech telegram channels, news sites, ministry and school contacts `(manual; sonnet drafts the texts)`
@@ -53,7 +68,7 @@ this is the biggest lever, because most uzbek users type on phones. the competit
 
 **exit:** a visible spike in installs around 2027-04-22.
 
-## phase 4: ios and macos (apr – jul 2027)
+## phase 5: ios and macos (apr – jul 2027)
 
 - [ ] swift core passing `spec/test-vectors.json` `(sonnet)`
 - [ ] ios keyboard extension (no "full access" needed, which keeps the privacy promise) `(opus for the design, sonnet to implement)`
@@ -62,15 +77,15 @@ this is the biggest lever, because most uzbek users type on phones. the competit
 
 **exit:** live on the app store.
 
-## phase 5: sustainability (h2 2027+)
+## phase 6: sustainability (h2 2027+)
 
 the core stays free forever. revenue options to evaluate once there are users:
 
-- [ ] desktop bulk document converter (.docx/.xlsx, old → new, cyrillic → new latin), fully offline, paid for organisations
+- [ ] paid extras for organisations built on the phase 2 converter: batch folders, command-line use for IT, support contract (the basic converter stays free)
 - [ ] b2b licensing for schools, publishers and government offices that must convert archives
 - [ ] donations or sponsorship ("powered by" from a local company)
 
-decide after phase 3, using real install numbers `(opus for the analysis)`.
+decide after phase 4, using real install numbers `(opus for the analysis)`.
 
 ---
 
