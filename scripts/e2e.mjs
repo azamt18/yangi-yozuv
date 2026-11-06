@@ -13,6 +13,7 @@ const PLAIN_PAGE = `<!doctype html><meta charset="utf-8">
 <div id="editor" contenteditable="true"></div>
 <input id="email" type="email">
 <div id="chat" contenteditable="true"></div>
+<p id="static">Shahar choy</p>
 <script>
   // Behaves like a chat app: Enter sends whatever is in the box.
   window.sent = [];
@@ -102,6 +103,19 @@ const valueOf = async (page, selector) => {
   );
 };
 
+// What the context menu and the shortcut do: the background worker sends this
+// message to the active tab, and the page answers with what it did.
+const worker = await (await browser.waitForTarget((t) => t.type() === 'service_worker')).worker();
+async function convertSelection(page) {
+  await page.bringToFront();
+  const kind = await worker.evaluate(async () => {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    return chrome.tabs.sendMessage(tab.id, { type: 'convert-selection' });
+  });
+  await settle();
+  return kind;
+}
+
 try {
   // ---- plain fields -------------------------------------------------------
   const page = await openPage('/');
@@ -184,6 +198,80 @@ try {
   await send.keyboard.press('Enter');
   await settle();
   check('lexical Enter converts before sending', await send.evaluate(() => window.sent[0]), 'Rahmat, yaxşi');
+
+  // ---- convert selection (context menu, Alt+Shift+Y) ------------------------
+  const sel = await openPage('/');
+  const setField = (selector, value, from, to) =>
+    sel.$eval(
+      selector,
+      (el, value, from, to) => {
+        el.value = value;
+        el.focus();
+        el.setSelectionRange(from ?? 0, to ?? value.length);
+      },
+      value,
+      from,
+      to,
+    );
+
+  await setField('#textarea', "Shahar choy шаҳар o'zbek");
+  check('selection: result', await convertSelection(sel), 'replaced');
+  check('selection: whole textarea', await valueOf(sel, '#textarea'), 'Şahar çoy şahar özbek');
+
+  await setField('#input', 'shahar choy shahar', 7, 11);
+  await convertSelection(sel);
+  check('selection: only the selected part changes', await valueOf(sel, '#input'), 'shahar çoy shahar');
+
+  await setField('#input', 'hello world 2027', 0, 16);
+  check('selection: nothing to convert', await convertSelection(sel), 'unchanged');
+  check('selection: text left as is', await valueOf(sel, '#input'), 'hello world 2027');
+
+  await sel.$eval('#input', (el) => el.setSelectionRange(3, 3));
+  check('selection: empty selection', await convertSelection(sel), 'none');
+
+  await sel.$eval('#editor', (el) => {
+    el.innerHTML = '<p>Shahar <b>choy</b> Тошкент</p><p>Ўзбек shop.uz</p>';
+    el.focus();
+    getSelection().selectAllChildren(el);
+  });
+  check('selection: rich text result', await convertSelection(sel), 'replaced');
+  // Known limitation: <b>choy</b> is a whole text node that starts after other
+  // text, and an edit there would lose its bold (see convert-selection.ts), so
+  // that word is left as it is. Everything around it converts.
+  check(
+    'selection: rich text keeps its formatting',
+    await sel.$eval('#editor', (el) => el.innerHTML),
+    '<p>Şahar <b>choy</b> Toşkent</p><p>Özbek shop.uz</p>',
+  );
+
+  // A word that starts right after a formatting boundary keeps the right
+  // formatting, or is left alone; it never turns bold by accident.
+  await sel.$eval('#editor', (el) => {
+    el.innerHTML = '<p><b>qalin </b>choy</p><p><b>qalin</b> shahar<br>choy</p>';
+    el.focus();
+    getSelection().selectAllChildren(el);
+  });
+  await convertSelection(sel);
+  check(
+    'selection: no formatting leaks across a boundary',
+    await sel.$eval('#editor', (el) => el.innerHTML),
+    '<p><b>qalin </b>choy</p><p><b>qalin</b> şahar<br>çoy</p>',
+  );
+
+  await sel.$eval('#static', (el) => {
+    getSelection().selectAllChildren(el);
+  });
+  check('selection: page text is copied, not edited', await convertSelection(sel), 'readonly');
+  check('selection: page text left as is', await valueOf(sel, '#static'), 'Shahar choy');
+  await sel.close();
+
+  const lexSel = await openPage('/lexical');
+  await lexSel.click('#editor');
+  await lexSel.keyboard.type('Shahar');
+  await lexSel.$eval('#editor', (el) => getSelection().selectAllChildren(el));
+  check('selection: lexical result', await convertSelection(lexSel), 'replaced');
+  check('selection: lexical text', await valueOf(lexSel, '#editor'), 'Şahar');
+  await lexSel.close();
 
   // ---- ProseMirror (chatgpt.com, claude.ai) ---------------------------------
   const pm = await openPage('/prosemirror');
