@@ -364,6 +364,12 @@ try {
   const popup = await browser.newPage();
   await popup.goto(`${worker.url().match(/^chrome-extension:\/\/[^/]+/)[0]}/popup.html`);
   await sleep(300); // let the popup read its settings
+  check(
+    'popup: every label is filled in from the locale files',
+    await popup.$$eval('[data-i18n]', (els) => els.every((el) => el.textContent.trim() && !el.textContent.includes('__MSG'))),
+    true,
+  );
+  check('popup: language follows the browser (en-US here)', await popup.$eval('#convert-copy', (el) => el.textContent), 'Copy');
   check('popup: copy button starts disabled', await popup.$eval('#convert-copy', (el) => el.disabled), true);
   await popup.type('#convert-input', "Shahar марказида choy, o'zbek https://shop.uz");
   check(

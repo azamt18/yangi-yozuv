@@ -51,7 +51,7 @@ build in this order. each step ships on its own, with unit tests plus an e2e cas
 - [x] **popup converter box**: a textarea, live conversion, and a copy button `(sonnet)`
 - [x] **exception list**: words in the popup settings that are never converted (case-insensitive, whole word), used by typing, selection, and page view `(sonnet)` (typing, selection, popup box and page view all read it)
 - [x] **view page in the new alphabet**: walks text nodes (skipping inputs, code/pre, scripts, contenteditable), keeps the originals in a WeakMap, has a "restore" button, and is per tab, not persistent. a MutationObserver handles content that loads later `(sonnet; opus if spa pages fight it)` **by hand:** the popup button itself (e2e sends the same messages, but can't open the popup as the real browser action)
-- [ ] ui languages uz (default), ru, en via `_locales` + `browser.i18n`, plus dark mode via `prefers-color-scheme` `(haiku)`
+- [x] ui languages uz (default), ru, en via `_locales` + `browser.i18n`, plus dark mode via `prefers-color-scheme` `(haiku)` (dark mode was already there). the ui follows the browser's language through `_locales`: an english-language chrome in uzbekistan shows english, there is no in-popup language switch yet. **uzbek text needs a native read-through**
 - [x] per-site on/off toggle in the popup `(sonnet)` (was already in 0.1)
 - [ ] edge add-ons and firefox builds (wxt supports both, so mostly packaging) `(sonnet)`
 - [ ] **shared test vectors**: export the core + cyrillic cases to `spec/test-vectors.json`, which becomes the single source of truth for kotlin and swift `(sonnet)`

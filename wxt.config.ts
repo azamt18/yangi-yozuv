@@ -4,6 +4,8 @@ import { defineConfig } from 'wxt';
 export default defineConfig({
   srcDir: 'src',
   manifest: {
+    // The popup, menu and messages follow the browser's language (uz, ru, en).
+    default_locale: 'uz',
     name: 'Yangi Yozuv: Ş Ç Ö Ğ',
     description:
       'Yangi özbek alifbosida yozing: sh→ş, ch→ç, oʻ→ö, gʻ→ğ avtomatik. Type the new Uzbek alphabet as you write.',
@@ -11,7 +13,7 @@ export default defineConfig({
     commands: {
       'convert-selection': {
         suggested_key: { default: 'Alt+Shift+Y' },
-        description: 'Belgilangan matnni yangi alifboga özgartiriş',
+        description: '__MSG_commandConvertSelection__',
       },
     },
     optional_host_permissions: ['*://*/*'],

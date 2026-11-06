@@ -1,3 +1,4 @@
+import { t } from '@/utils/i18n';
 import { MESSAGE_CONVERT_SELECTION } from '@/utils/messages';
 import { DEFAULT_SITES, EXCLUDED_SITES } from '@/utils/sites';
 
@@ -27,7 +28,7 @@ export default defineBackground(() => {
     syncExtraSites();
     browser.contextMenus.create({
       id: CONVERT_SELECTION_ID,
-      title: 'Yangi alifboga özgartiriş (ş ç ö ğ)',
+      title: t('menuConvertSelection'),
       contexts: ['selection'],
     });
   });

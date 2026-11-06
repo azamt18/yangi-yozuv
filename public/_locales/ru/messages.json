@@ -1,0 +1,82 @@
+{
+  "enabled": {
+    "message": "Включено"
+  },
+  "siteSwitch": {
+    "message": "Работать на этом сайте"
+  },
+  "siteGrant": {
+    "message": "Включить на этом сайте"
+  },
+  "pageUnsupported": {
+    "message": "На этой странице не работает"
+  },
+  "skipTitle": {
+    "message": "Слова-исключения"
+  },
+  "skipPlaceholder": {
+    "message": "Например: Shohruh"
+  },
+  "skipAdd": {
+    "message": "Добавить"
+  },
+  "skipRemove": {
+    "message": "Удалить: $WORD$",
+    "placeholders": {
+      "word": {
+        "content": "$1"
+      }
+    }
+  },
+  "footerUndo": {
+    "message": "Если заменило лишнее, сразу нажмите Backspace."
+  },
+  "footerPrivacy": {
+    "message": "Ничего не покидает ваш компьютер."
+  },
+  "converterTitle": {
+    "message": "Конвертер текста"
+  },
+  "converterPlaceholder": {
+    "message": "Вставьте текст: латиница или кириллица"
+  },
+  "converterOutput": {
+    "message": "Текст в новом алфавите"
+  },
+  "copy": {
+    "message": "Копировать"
+  },
+  "copied": {
+    "message": "Скопировано"
+  },
+  "pageViewOn": {
+    "message": "Показать страницу в новом алфавите"
+  },
+  "pageViewOff": {
+    "message": "Вернуть как было"
+  },
+  "pageNotUzbek": {
+    "message": "Похоже, страница не на узбекском."
+  },
+  "pageForce": {
+    "message": "Всё равно преобразовать"
+  },
+  "toastCopied": {
+    "message": "Скопировано в новом алфавите"
+  },
+  "toastCopyFailed": {
+    "message": "Не удалось скопировать"
+  },
+  "toastReadonly": {
+    "message": "Этот текст изменить нельзя. Скопируйте версию в новом алфавите:"
+  },
+  "toastUnchanged": {
+    "message": "Нечего преобразовывать"
+  },
+  "menuConvertSelection": {
+    "message": "Преобразовать в новый алфавит (ş ç ö ğ)"
+  },
+  "commandConvertSelection": {
+    "message": "Преобразовать выделенный текст в новый алфавит"
+  }
+}

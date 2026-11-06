@@ -1,4 +1,5 @@
 import { convertText } from '@/core/convert';
+import { t } from '@/utils/i18n';
 import { MESSAGE_PAGE_VIEW, type PageViewState } from '@/utils/messages';
 import { disabledSitesItem, enabledItem, skipWordsItem } from '@/utils/settings';
 import { siteOrigin } from '@/utils/sites';
@@ -55,7 +56,7 @@ async function setUpSkipWords() {
         const remove = document.createElement('button');
         remove.type = 'button';
         remove.textContent = '×';
-        remove.ariaLabel = `Öçiriş: ${word}`;
+        remove.ariaLabel = t('skipRemove', word);
         remove.addEventListener('click', async () => {
           const current = await skipWordsItem.getValue();
           await skipWordsItem.setValue(current.filter((w) => w !== word));
@@ -98,8 +99,8 @@ async function setUpConverter() {
 
   copy.addEventListener('click', async () => {
     await navigator.clipboard.writeText(output.value);
-    copy.textContent = 'Nusxalandi';
-    setTimeout(() => (copy.textContent = 'Nusxa oliş'), 1500);
+    copy.textContent = t('copied');
+    setTimeout(() => (copy.textContent = t('copy')), 1500);
   });
 }
 
@@ -110,7 +111,7 @@ async function setUpPageView() {
 
   const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
   if (tab?.id === undefined || !tab.url?.startsWith('http')) {
-    note.textContent = 'Bu sahifada işlamaydi';
+    note.textContent = t('pageUnsupported');
     note.hidden = false;
     return;
   }
@@ -122,9 +123,9 @@ async function setUpPageView() {
   const show = (state: PageViewState) => {
     toggle.disabled = false;
     toggle.dataset.state = state;
-    toggle.textContent = state === 'on' ? 'Asliga qaytariş' : 'Sahifani yangi alifboda köriş';
+    toggle.textContent = state === 'on' ? t('pageViewOff') : t('pageViewOn');
     note.hidden = force.hidden = state !== 'not-uzbek';
-    note.textContent = 'Bu sahifa özbek tilida emasdek köriniyapti.';
+    note.textContent = t('pageNotUzbek');
   };
 
   // The actions script is only in the page once something has asked for it, so
@@ -143,6 +144,21 @@ async function setUpPageView() {
   force.addEventListener('click', () => run('start', true));
 }
 
+/** Fills in the text of everything marked data-i18n, data-i18n-placeholder or data-i18n-aria-label. */
+function localizePage() {
+  for (const el of document.querySelectorAll<HTMLElement>('[data-i18n]')) {
+    el.textContent = t(el.dataset.i18n!);
+  }
+  for (const el of document.querySelectorAll<HTMLInputElement>('[data-i18n-placeholder]')) {
+    el.placeholder = t(el.dataset.i18nPlaceholder!);
+  }
+  for (const el of document.querySelectorAll<HTMLElement>('[data-i18n-aria-label]')) {
+    el.ariaLabel = t(el.dataset.i18nAriaLabel!);
+  }
+  document.documentElement.lang = browser.i18n.getUILanguage().split('-')[0]!;
+}
+
+localizePage();
 setUpPageView();
 setUpConverter();
 setUpEnabledSwitch();

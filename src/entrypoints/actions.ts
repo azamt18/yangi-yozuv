@@ -3,7 +3,8 @@ import { convertSelection } from '@/utils/convert-selection';
 import { MESSAGE_CONVERT_SELECTION, MESSAGE_PAGE_VIEW, type PageViewState } from '@/utils/messages';
 import { PageView } from '@/utils/page-view';
 import { skipWordsItem } from '@/utils/settings';
-import { TEXT, showToast } from '@/utils/toast';
+import { t } from '@/utils/i18n';
+import { showToast } from '@/utils/toast';
 
 // Things the user asks for explicitly (the context menu, the shortcut, buttons
 // in the popup). This script is injected on demand and is separate from the
@@ -48,14 +49,14 @@ async function handlePageView(
 async function convertSelectionAndReport(): Promise<string> {
   const result = await convertSelection(new Set(await skipWordsItem.getValue()));
   if (result.kind === 'unchanged') {
-    showToast({ message: TEXT.unchanged });
+    showToast({ message: t('toastUnchanged') });
   } else if (result.kind === 'readonly') {
     try {
       await navigator.clipboard.writeText(result.text);
-      showToast({ message: TEXT.copied });
+      showToast({ message: t('toastCopied') });
     } catch {
       // The page doesn't allow a script to write to the clipboard here.
-      showToast({ message: TEXT.readonly, copyText: result.text });
+      showToast({ message: t('toastReadonly'), copyText: result.text });
     }
   }
   return result.kind;

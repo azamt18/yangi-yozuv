@@ -1,0 +1,82 @@
+{
+  "enabled": {
+    "message": "Yoqilgan"
+  },
+  "siteSwitch": {
+    "message": "Bu saytda işlasin"
+  },
+  "siteGrant": {
+    "message": "Bu saytda yoqiş"
+  },
+  "pageUnsupported": {
+    "message": "Bu sahifada işlamaydi"
+  },
+  "skipTitle": {
+    "message": "Özgartirilmaydigan sözlar"
+  },
+  "skipPlaceholder": {
+    "message": "Masalan: Shohruh"
+  },
+  "skipAdd": {
+    "message": "Qöşiş"
+  },
+  "skipRemove": {
+    "message": "Öçiriş: $WORD$",
+    "placeholders": {
+      "word": {
+        "content": "$1"
+      }
+    }
+  },
+  "footerUndo": {
+    "message": "Xato almaştirsa, darhol Backspace bosing."
+  },
+  "footerPrivacy": {
+    "message": "Heç narsa kompyuteringizdan çiqmaydi."
+  },
+  "converterTitle": {
+    "message": "Matn ögiruvçi"
+  },
+  "converterPlaceholder": {
+    "message": "Matnni şu yerga qöying: lotin yoki kirill"
+  },
+  "converterOutput": {
+    "message": "Yangi alifbodagi matn"
+  },
+  "copy": {
+    "message": "Nusxa oliş"
+  },
+  "copied": {
+    "message": "Nusxalandi"
+  },
+  "pageViewOn": {
+    "message": "Sahifani yangi alifboda köriş"
+  },
+  "pageViewOff": {
+    "message": "Asliga qaytariş"
+  },
+  "pageNotUzbek": {
+    "message": "Bu sahifa özbek tilida emasdek köriniyapti."
+  },
+  "pageForce": {
+    "message": "Baribir özgartiriş"
+  },
+  "toastCopied": {
+    "message": "Yangi alifboda nusxalandi"
+  },
+  "toastCopyFailed": {
+    "message": "Nusxalab bölmadi"
+  },
+  "toastReadonly": {
+    "message": "Bu matnni özgartirib bölmaydi. Yangi alifbodagisini nusxalang:"
+  },
+  "toastUnchanged": {
+    "message": "Almaştiriladigan harf yöq"
+  },
+  "menuConvertSelection": {
+    "message": "Yangi alifboga özgartiriş (ş ç ö ğ)"
+  },
+  "commandConvertSelection": {
+    "message": "Belgilangan matnni yangi alifboga özgartiriş"
+  }
+}

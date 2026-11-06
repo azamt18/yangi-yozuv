@@ -14,50 +14,50 @@
     </header>
 
     <section class="converter">
-      <h2><label for="convert-input">Matn ögiruvçi</label></h2>
+      <h2><label for="convert-input" data-i18n="converterTitle"></label></h2>
       <textarea
         id="convert-input"
         rows="3"
-        placeholder="Matnni shu yerga qöying: lotin yoki kirill"
+        data-i18n-placeholder="converterPlaceholder"
         spellcheck="false"
       ></textarea>
-      <textarea id="convert-output" rows="3" readonly aria-label="Yangi alifbodagi matn"></textarea>
-      <button id="convert-copy" type="button" disabled>Nusxa oliş</button>
+      <textarea id="convert-output" rows="3" readonly data-i18n-aria-label="converterOutput"></textarea>
+      <button id="convert-copy" type="button" data-i18n="copy" disabled></button>
     </section>
 
     <section class="page-view">
-      <button id="page-view-toggle" type="button" disabled>Sahifani yangi alifboda köriş</button>
+      <button id="page-view-toggle" type="button" data-i18n="pageViewOn" disabled></button>
       <p id="page-view-note" class="muted" hidden></p>
-      <button id="page-view-force" type="button" class="secondary" hidden>Baribir özgartiriş</button>
+      <button id="page-view-force" type="button" class="secondary" data-i18n="pageForce" hidden></button>
     </section>
 
     <label class="row switch">
-      <span>Yoqilgan</span>
+      <span data-i18n="enabled"></span>
       <input id="enabled" type="checkbox" role="switch" />
     </label>
 
     <section class="row site" id="site">
       <span id="site-name" class="site-name"></span>
       <label id="site-toggle" class="switch" hidden>
-        <span>Bu saytda işlasin</span>
+        <span data-i18n="siteSwitch"></span>
         <input id="site-enabled" type="checkbox" role="switch" />
       </label>
-      <button id="site-grant" type="button" hidden>Bu saytda yoqiş</button>
-      <span id="site-unsupported" class="muted" hidden>Bu sahifada işlamaydi</span>
+      <button id="site-grant" type="button" data-i18n="siteGrant" hidden></button>
+      <span id="site-unsupported" class="muted" data-i18n="pageUnsupported" hidden></span>
     </section>
 
     <section class="skip">
-      <h2>Özgartirilmaydigan sözlar</h2>
+      <h2 data-i18n="skipTitle"></h2>
       <form id="skip-form">
-        <input id="skip-input" type="text" placeholder="Masalan: Shohruh" autocomplete="off" />
-        <button type="submit">Qöşiş</button>
+        <input id="skip-input" type="text" data-i18n-placeholder="skipPlaceholder" autocomplete="off" />
+        <button type="submit" data-i18n="skipAdd"></button>
       </form>
       <ul id="skip-list"></ul>
     </section>
 
     <footer>
-      <p>Xato almaştirsa, darhol Backspace bosing.</p>
-      <p class="privacy">Heç narsa kompyuteringizdan çiqmaydi.</p>
+      <p data-i18n="footerUndo"></p>
+      <p class="privacy" data-i18n="footerPrivacy"></p>
     </footer>
 
     <script type="module" src="./main.ts"></script>

@@ -1,3 +1,5 @@
+import { t } from './i18n';
+
 const HIDE_AFTER_MS = 6000;
 
 let current: HTMLElement | null = null;
@@ -31,14 +33,14 @@ export function showToast({ message, copyText }: { message: string; copyText?: s
 
   if (copyText !== undefined) {
     const button = document.createElement('button');
-    button.textContent = TEXT.copy;
+    button.textContent = t('copy');
     button.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(copyText);
-        text.textContent = TEXT.copied;
+        text.textContent = t('copied');
         button.remove();
       } catch {
-        text.textContent = TEXT.copyFailed;
+        text.textContent = t('toastCopyFailed');
       }
     });
     toast.append(button);
@@ -49,11 +51,3 @@ export function showToast({ message, copyText }: { message: string; copyText?: s
   current = host;
   setTimeout(() => host.remove(), HIDE_AFTER_MS);
 }
-
-export const TEXT = {
-  copied: 'Yangi alifboda nusxalandi',
-  copy: 'Nusxa oliş',
-  copyFailed: 'Nusxalab bölmadi',
-  readonly: 'Bu matnni özgartirib bölmaydi. Yangi alifbodagisini nusxalang:',
-  unchanged: 'Almaştiriladigan harf yöq',
-};

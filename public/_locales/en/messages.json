@@ -1,0 +1,82 @@
+{
+  "enabled": {
+    "message": "Enabled"
+  },
+  "siteSwitch": {
+    "message": "Work on this site"
+  },
+  "siteGrant": {
+    "message": "Turn on for this site"
+  },
+  "pageUnsupported": {
+    "message": "Doesn't work on this page"
+  },
+  "skipTitle": {
+    "message": "Words never converted"
+  },
+  "skipPlaceholder": {
+    "message": "For example: Shohruh"
+  },
+  "skipAdd": {
+    "message": "Add"
+  },
+  "skipRemove": {
+    "message": "Remove: $WORD$",
+    "placeholders": {
+      "word": {
+        "content": "$1"
+      }
+    }
+  },
+  "footerUndo": {
+    "message": "If it converts something by mistake, press Backspace right away."
+  },
+  "footerPrivacy": {
+    "message": "Nothing leaves your computer."
+  },
+  "converterTitle": {
+    "message": "Text converter"
+  },
+  "converterPlaceholder": {
+    "message": "Paste text here: Latin or Cyrillic"
+  },
+  "converterOutput": {
+    "message": "Text in the new alphabet"
+  },
+  "copy": {
+    "message": "Copy"
+  },
+  "copied": {
+    "message": "Copied"
+  },
+  "pageViewOn": {
+    "message": "View page in the new alphabet"
+  },
+  "pageViewOff": {
+    "message": "Show the original"
+  },
+  "pageNotUzbek": {
+    "message": "This page doesn't look Uzbek."
+  },
+  "pageForce": {
+    "message": "Convert anyway"
+  },
+  "toastCopied": {
+    "message": "Copied in the new alphabet"
+  },
+  "toastCopyFailed": {
+    "message": "Couldn't copy"
+  },
+  "toastReadonly": {
+    "message": "This text can't be edited. Copy the new-alphabet version:"
+  },
+  "toastUnchanged": {
+    "message": "Nothing to convert"
+  },
+  "menuConvertSelection": {
+    "message": "Convert to the new alphabet (ş ç ö ğ)"
+  },
+  "commandConvertSelection": {
+    "message": "Convert the selected text to the new alphabet"
+  }
+}
