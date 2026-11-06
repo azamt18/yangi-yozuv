@@ -54,7 +54,7 @@ build in this order. each step ships on its own, with unit tests plus an e2e cas
 - [x] ui languages uz (default), ru, en via `_locales` + `browser.i18n`, plus dark mode via `prefers-color-scheme` `(haiku)` (dark mode was already there). the ui follows the browser's language through `_locales`: an english-language chrome in uzbekistan shows english, there is no in-popup language switch yet. **uzbek text needs a native read-through**
 - [x] per-site on/off toggle in the popup `(sonnet)` (was already in 0.1)
 - [x] edge add-ons and firefox builds `(sonnet)`. firefox builds as mv3 (`npm run zip:firefox`), `web-ext lint` is clean, steps in `docs/PUBLISHING.md`. **not yet run inside firefox itself**, and the actual store submissions are yours to do
-- [ ] **shared test vectors**: export the core + cyrillic cases to `spec/test-vectors.json`, which becomes the single source of truth for kotlin and swift `(sonnet)`
+- [x] **shared test vectors**: export the core + cyrillic cases to `spec/test-vectors.json`, which becomes the single source of truth for kotlin and swift `(sonnet)` 142 cases in `spec/test-vectors.json`, with the contract for ports in `spec/README.md`; `src/core/test-vectors.test.ts` makes the typescript code pass them
 - [ ] local-only usage counter in the popup ("you converted 1,240 words"). it stays on the device, nothing is sent `(haiku)`
 - [ ] update the store listing: "the only one that converts *as you type*, and it also converts cyrillic, selections and whole pages" plus new screenshots `(sonnet)`
 - [ ] later (low priority): reverse direction, new latin → cyrillic / old latin `(sonnet)`
