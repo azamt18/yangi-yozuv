@@ -40,7 +40,7 @@ has no analytics and needs no account. Settings stay in your browser. See
 
 ## Install
 
-Chrome Web Store: _coming soon._
+Chrome Web Store: [Yangi Yozuv](https://chromewebstore.google.com/detail/yangi-yozuv-%C5%9F-%C3%A7-%C3%B6-%C4%9F/hbbpngbdccngoclkgoppplpblaejphca)
 
 To try it now from source (Chrome, Edge, Opera, Yandex Browser):
 
