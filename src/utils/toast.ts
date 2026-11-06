@@ -52,7 +52,7 @@ export function showToast({ message, copyText }: { message: string; copyText?: s
 
 export const TEXT = {
   copied: 'Yangi alifboda nusxalandi',
-  copy: 'Nusxa olish',
+  copy: 'Nusxa oliş',
   copyFailed: 'Nusxalab bölmadi',
   readonly: 'Bu matnni özgartirib bölmaydi. Yangi alifbodagisini nusxalang:',
   unchanged: 'Almaştiriladigan harf yöq',

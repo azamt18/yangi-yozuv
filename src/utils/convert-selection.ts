@@ -18,7 +18,7 @@ const TEXT_INPUT_TYPES = new Set(['text', 'search', '']);
  * the new alphabet. Inside an editable field the selection is replaced in place;
  * on a normal page the converted text is returned for the caller to copy.
  */
-export function convertSelection(skipWords: ReadonlySet<string>): SelectionResult {
+export async function convertSelection(skipWords: ReadonlySet<string>): Promise<SelectionResult> {
   const convert = (text: string) => convertText(text, { skipWords });
   const active = document.activeElement;
 
@@ -80,10 +80,30 @@ export function convertSelection(skipWords: ReadonlySet<string>): SelectionResul
     part.setEnd(node, end - tail);
     selection.removeAllRanges();
     selection.addRange(part);
+    await selectionSettled();
     document.execCommand('insertText', false, converted.slice(head, converted.length - tail));
     changed = true;
   }
   return changed ? { kind: 'replaced' } : { kind: 'unchanged' };
+}
+
+/**
+ * Waits until editors have noticed a selection we just set. Lexical updates its
+ * own idea of the selection a tick after the browser's `selectionchange`; if we
+ * insert before that, it still thinks the old, larger selection is current and
+ * replaces all of it.
+ */
+function selectionSettled(): Promise<void> {
+  return new Promise((resolve) => {
+    const done = () => {
+      document.removeEventListener('selectionchange', done);
+      clearTimeout(timer);
+      setTimeout(resolve);
+    };
+    // No event fires if the selection didn't actually change.
+    const timer = setTimeout(done, 50);
+    document.addEventListener('selectionchange', done);
+  });
 }
 
 /** True when no other text comes before this node on its line. */

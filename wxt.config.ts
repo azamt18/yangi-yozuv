@@ -11,7 +11,7 @@ export default defineConfig({
     commands: {
       'convert-selection': {
         suggested_key: { default: 'Alt+Shift+Y' },
-        description: 'Belgilangan matnni yangi alifboga özgartirish',
+        description: 'Belgilangan matnni yangi alifboga özgartiriş',
       },
     },
     optional_host_permissions: ['*://*/*'],

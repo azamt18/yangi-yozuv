@@ -148,7 +148,7 @@ export default defineContentScript({
 });
 
 async function convertSelectionAndReport(): Promise<string> {
-  const result = convertSelection(new Set(await skipWordsItem.getValue()));
+  const result = await convertSelection(new Set(await skipWordsItem.getValue()));
   if (result.kind === 'unchanged') {
     showToast({ message: TEXT.unchanged });
   } else if (result.kind === 'readonly') {

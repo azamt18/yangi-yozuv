@@ -26,7 +26,7 @@ export default defineBackground(() => {
     syncExtraSites();
     browser.contextMenus.create({
       id: CONVERT_SELECTION_ID,
-      title: 'Yangi alifboga özgartirish (ş ç ö ğ)',
+      title: 'Yangi alifboga özgartiriş (ş ç ö ğ)',
       contexts: ['selection'],
     });
   });
