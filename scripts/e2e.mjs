@@ -360,6 +360,19 @@ try {
   check('page view: forced conversion', await englishText(), 'The shop sells tea and the church is old. Privet, kak dela?');
   await english.close();
 
+  // ---- local word counter ----------------------------------------------------
+  const counted = () =>
+    worker.evaluate(async () => (await chrome.storage.local.get('wordsConverted')).wordsConverted ?? 0);
+  const countPage = await openPage('/');
+  const before = await counted();
+  await countPage.type('#input', 'shahar choy kitob tog\' ');
+  await settle();
+  check('counter: three converted words are counted', (await counted()) - before, 3);
+  await countPage.keyboard.press('Backspace');
+  await settle();
+  check('counter: an undone conversion is taken back', (await counted()) - before, 2);
+  await countPage.close();
+
   // ---- popup converter box --------------------------------------------------
   const popup = await browser.newPage();
   await popup.goto(`${worker.url().match(/^chrome-extension:\/\/[^/]+/)[0]}/popup.html`);
@@ -370,6 +383,11 @@ try {
     true,
   );
   check('popup: language follows the browser (en-US here)', await popup.$eval('#convert-copy', (el) => el.textContent), 'Copy');
+  check(
+    'popup: counter line shows the number',
+    await popup.$eval('#stats', (el) => !el.hidden && /^[\d,\u00a0\u202f. ]+ words converted so far$/.test(el.textContent)),
+    true,
+  );
   check('popup: copy button starts disabled', await popup.$eval('#convert-copy', (el) => el.disabled), true);
   await popup.type('#convert-input', "Shahar марказида choy, o'zbek https://shop.uz");
   check(

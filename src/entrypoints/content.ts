@@ -1,6 +1,7 @@
 import { isWordBoundary, planConversion } from '@/core/typing';
 import { disabledSitesItem, enabledItem, skipWordsItem } from '@/utils/settings';
 import { DEFAULT_SITES, EXCLUDED_SITES } from '@/utils/sites';
+import { addConverted } from '@/utils/stats';
 
 type Editable = HTMLInputElement | HTMLTextAreaElement | HTMLElement;
 
@@ -83,6 +84,7 @@ export default defineContentScript({
 
         context.select(plan.start, plan.end);
         document.execCommand('insertText', false, plan.replacement);
+        addConverted(1);
 
         // The browser types the boundary character right after this handler.
         if (isBoundaryKey) {
@@ -125,6 +127,7 @@ export default defineContentScript({
       // up with the edit, which would undo an immediate move.
       context.select(start, start + replacement.length);
       document.execCommand('insertText', false, original);
+      addConverted(-1);
       setTimeout(() => {
         const after = caretContext(target);
         if (after) after.select(after.caret + boundary.length, after.caret + boundary.length);

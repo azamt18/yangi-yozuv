@@ -1,3 +1,4 @@
+import { changedWords } from '@/core/changed-words';
 import { convertText } from '@/core/convert';
 
 export type SelectionResult =
@@ -6,9 +7,9 @@ export type SelectionResult =
   /** The selection has no letters to convert. */
   | { kind: 'unchanged' }
   /** The selection was an editable field and has been rewritten in place. */
-  | { kind: 'replaced' }
+  | { kind: 'replaced'; words: number }
   /** The selection is page text we can't edit; this is the converted version. */
-  | { kind: 'readonly'; text: string };
+  | { kind: 'readonly'; text: string; words: number };
 
 // Input types where people type words; the same list the typing code uses.
 const TEXT_INPUT_TYPES = new Set(['text', 'search', '']);
@@ -28,15 +29,16 @@ export async function convertSelection(skipWords: ReadonlySet<string>): Promise<
     }
     const { selectionStart: start, selectionEnd: end } = active;
     if (start === null || end === null || start === end) return { kind: 'none' };
-    const converted = convert(active.value.slice(start, end));
-    if (converted === active.value.slice(start, end)) return { kind: 'unchanged' };
+    const original = active.value.slice(start, end);
+    const converted = convert(original);
+    if (converted === original) return { kind: 'unchanged' };
     // The selection is still in place, so this replaces exactly that text and
     // keeps the browser's undo history.
     if (!document.execCommand('insertText', false, converted)) {
       active.setRangeText(converted, start, end, 'select');
       active.dispatchEvent(new Event('input', { bubbles: true }));
     }
-    return { kind: 'replaced' };
+    return { kind: 'replaced', words: changedWords(original, converted) };
   }
 
   const selection = window.getSelection();
@@ -46,13 +48,15 @@ export async function convertSelection(skipWords: ReadonlySet<string>): Promise<
   if (!isEditable(range.commonAncestorContainer)) {
     const text = selection.toString();
     const converted = convert(text);
-    return converted === text ? { kind: 'unchanged' } : { kind: 'readonly', text: converted };
+    return converted === text
+      ? { kind: 'unchanged' }
+      : { kind: 'readonly', text: converted, words: changedWords(text, converted) };
   }
 
   // Rich editors: convert one text node at a time so bold, links and line
   // breaks stay as they are. A word split across two formatting runs is left
   // alone. Going from the end keeps the earlier offsets valid.
-  let changed = false;
+  let words = 0;
   for (const { node, start, end } of textSegments(range).reverse()) {
     const original = node.data.slice(start, end);
     const converted = convert(original);
@@ -82,9 +86,9 @@ export async function convertSelection(skipWords: ReadonlySet<string>): Promise<
     selection.addRange(part);
     await selectionSettled();
     document.execCommand('insertText', false, converted.slice(head, converted.length - tail));
-    changed = true;
+    words += changedWords(original, converted);
   }
-  return changed ? { kind: 'replaced' } : { kind: 'unchanged' };
+  return words ? { kind: 'replaced', words } : { kind: 'unchanged' };
 }
 
 /**

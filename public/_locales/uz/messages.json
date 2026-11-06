@@ -78,5 +78,13 @@
   },
   "commandConvertSelection": {
     "message": "Belgilangan matnni yangi alifboga özgartiriş"
+  },
+  "statsConverted": {
+    "message": "$COUNT$ ta söz almaştirildi",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }

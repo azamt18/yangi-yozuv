@@ -1,7 +1,7 @@
 import { convertText } from '@/core/convert';
 import { t } from '@/utils/i18n';
 import { MESSAGE_PAGE_VIEW, type PageViewState } from '@/utils/messages';
-import { disabledSitesItem, enabledItem, skipWordsItem } from '@/utils/settings';
+import { disabledSitesItem, enabledItem, skipWordsItem, wordsConvertedItem } from '@/utils/settings';
 import { siteOrigin } from '@/utils/sites';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -158,7 +158,18 @@ function localizePage() {
   document.documentElement.lang = browser.i18n.getUILanguage().split('-')[0]!;
 }
 
+async function setUpStats() {
+  const line = $('stats');
+  const show = (count: number) => {
+    line.hidden = count === 0; // nothing to show before the first conversion
+    line.textContent = t('statsConverted', count.toLocaleString());
+  };
+  show(await wordsConvertedItem.getValue());
+  wordsConvertedItem.watch(show);
+}
+
 localizePage();
+setUpStats();
 setUpPageView();
 setUpConverter();
 setUpEnabledSwitch();

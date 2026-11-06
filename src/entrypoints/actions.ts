@@ -4,6 +4,7 @@ import { MESSAGE_CONVERT_SELECTION, MESSAGE_PAGE_VIEW, type PageViewState } from
 import { PageView } from '@/utils/page-view';
 import { skipWordsItem } from '@/utils/settings';
 import { t } from '@/utils/i18n';
+import { addConverted } from '@/utils/stats';
 import { showToast } from '@/utils/toast';
 
 // Things the user asks for explicitly (the context menu, the shortcut, buttons
@@ -48,6 +49,7 @@ async function handlePageView(
 
 async function convertSelectionAndReport(): Promise<string> {
   const result = await convertSelection(new Set(await skipWordsItem.getValue()));
+  if (result.kind === 'replaced' || result.kind === 'readonly') await addConverted(result.words);
   if (result.kind === 'unchanged') {
     showToast({ message: t('toastUnchanged') });
   } else if (result.kind === 'readonly') {

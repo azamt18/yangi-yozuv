@@ -78,5 +78,13 @@
   },
   "commandConvertSelection": {
     "message": "Преобразовать выделенный текст в новый алфавит"
+  },
+  "statsConverted": {
+    "message": "Преобразовано слов: $COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }

@@ -78,5 +78,13 @@
   },
   "commandConvertSelection": {
     "message": "Convert the selected text to the new alphabet"
+  },
+  "statsConverted": {
+    "message": "$COUNT$ words converted so far",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }

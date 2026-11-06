@@ -15,3 +15,8 @@ export const disabledSitesItem = storage.defineItem<string[]>('local:disabledSit
 export const skipWordsItem = storage.defineItem<string[]>('local:skipWords', {
   fallback: [],
 });
+
+/** How many words the extension has converted for the user, shown in the popup. */
+export const wordsConvertedItem = storage.defineItem<number>('local:wordsConverted', {
+  fallback: 0,
+});

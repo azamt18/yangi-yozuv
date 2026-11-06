@@ -1,6 +1,6 @@
 # Yangi Yozuv privacy policy
 
-_Last updated: 1 November 2026_
+_Last updated: 6 November 2026_
 
 **Short version: nothing you type ever leaves your computer.**
 
@@ -9,10 +9,11 @@ reads text you type into text fields on the sites where it is turned on. That
 text is processed inside your browser and is never stored, logged or sent
 anywhere. The extension makes no network requests.
 
-The only things saved are your settings: whether the extension is on, the sites
-where you turned it off, and the words you asked it never to convert. They are
+The only things saved are your settings (whether the extension is on, the sites
+where you turned it off, and the words you asked it never to convert) and one
+number: how many words the extension has converted, shown in its popup. They are
 kept in your browser's local extension storage and are deleted when you remove
-the extension.
+the extension. The number is never sent anywhere.
 
 There are no accounts, no analytics, no ads and no third parties.
 
@@ -22,4 +23,5 @@ There are no accounts, no analytics, no ads and no third parties.
 
 Yangi Yozuv siz yozgan matnni faqat brauzeringiz ichida oʻzgartiradi. Matn
 saqlanmaydi va hech qayerga yuborilmaydi. Faqat sozlamalaringiz (yoqilgan/oʻchirilgan,
-oʻchirilgan saytlar, oʻzgartirilmaydigan soʻzlar) brauzeringizda saqlanadi.
+oʻchirilgan saytlar, oʻzgartirilmaydigan soʻzlar) va almashtirilgan soʻzlar soni
+brauzeringizda saqlanadi. Hech qayerga yuborilmaydi.
