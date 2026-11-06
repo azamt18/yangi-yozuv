@@ -13,6 +13,18 @@
       <p class="rules">sh→ş · ch→ç · oʻ→ö · gʻ→ğ</p>
     </header>
 
+    <section class="converter">
+      <h2><label for="convert-input">Matn ögiruvçi</label></h2>
+      <textarea
+        id="convert-input"
+        rows="3"
+        placeholder="Matnni shu yerga qöying: lotin yoki kirill"
+        spellcheck="false"
+      ></textarea>
+      <textarea id="convert-output" rows="3" readonly aria-label="Yangi alifbodagi matn"></textarea>
+      <button id="convert-copy" type="button" disabled>Nusxa oliş</button>
+    </section>
+
     <label class="row switch">
       <span>Yoqilgan</span>
       <input id="enabled" type="checkbox" role="switch" />

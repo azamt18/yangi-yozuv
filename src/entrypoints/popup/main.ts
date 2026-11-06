@@ -1,3 +1,4 @@
+import { convertText } from '@/core/convert';
 import { disabledSitesItem, enabledItem, skipWordsItem } from '@/utils/settings';
 import { siteOrigin } from '@/utils/sites';
 
@@ -77,6 +78,31 @@ async function setUpSkipWords() {
   });
 }
 
+async function setUpConverter() {
+  const input = $<HTMLTextAreaElement>('convert-input');
+  const output = $<HTMLTextAreaElement>('convert-output');
+  const copy = $<HTMLButtonElement>('convert-copy');
+
+  let skipWords = new Set(await skipWordsItem.getValue());
+  skipWordsItem.watch((words) => {
+    skipWords = new Set(words);
+    update();
+  });
+
+  function update() {
+    output.value = convertText(input.value, { skipWords });
+    copy.disabled = !output.value;
+  }
+  input.addEventListener('input', update);
+
+  copy.addEventListener('click', async () => {
+    await navigator.clipboard.writeText(output.value);
+    copy.textContent = 'Nusxalandi';
+    setTimeout(() => (copy.textContent = 'Nusxa oliş'), 1500);
+  });
+}
+
+setUpConverter();
 setUpEnabledSwitch();
 setUpSiteRow();
 setUpSkipWords();

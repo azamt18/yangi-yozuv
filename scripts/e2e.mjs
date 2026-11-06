@@ -273,6 +273,20 @@ try {
   check('selection: lexical text', await valueOf(lexSel, '#editor'), 'Şahar');
   await lexSel.close();
 
+  // ---- popup converter box --------------------------------------------------
+  const popup = await browser.newPage();
+  await popup.goto(`${worker.url().match(/^chrome-extension:\/\/[^/]+/)[0]}/popup.html`);
+  await sleep(300); // let the popup read its settings
+  check('popup: copy button starts disabled', await popup.$eval('#convert-copy', (el) => el.disabled), true);
+  await popup.type('#convert-input', "Shahar марказида choy, o'zbek https://shop.uz");
+  check(
+    'popup: live conversion of latin and cyrillic',
+    await popup.$eval('#convert-output', (el) => el.value),
+    'Şahar markazida çoy, özbek https://shop.uz',
+  );
+  check('popup: copy button enabled', await popup.$eval('#convert-copy', (el) => el.disabled), false);
+  await popup.close();
+
   // ---- ProseMirror (chatgpt.com, claude.ai) ---------------------------------
   const pm = await openPage('/prosemirror');
   await pm.click('#editor .ProseMirror');
